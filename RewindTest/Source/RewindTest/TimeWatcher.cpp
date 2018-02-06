@@ -18,9 +18,8 @@ UTimeWatcher::UTimeWatcher()
 void UTimeWatcher::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
+	Records.Empty();
+	bCanSaveRecords = true;
 }
 
 
@@ -28,8 +27,6 @@ void UTimeWatcher::BeginPlay()
 void UTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
 void UTimeWatcher::SaveCurrentRecord()
@@ -37,6 +34,7 @@ void UTimeWatcher::SaveCurrentRecord()
 	FRecordData Record = FRecordData();
 	Record.Position = this->GetOwner()->GetActorLocation();
 	Record.Rotation = this->GetOwner()->GetActorRotation();
+	Record.AnimationName = "";
 	Records.Add(Record);
 }
 
