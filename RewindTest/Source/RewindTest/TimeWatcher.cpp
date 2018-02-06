@@ -2,6 +2,7 @@
 
 #include "TimeWatcher.h"
 #include "Components/ActorComponent.h"
+#include "Engine/World.h"
 
 // Sets default values for this component's properties
 UTimeWatcher::UTimeWatcher()
@@ -19,7 +20,7 @@ void UTimeWatcher::BeginPlay()
 {
 	Super::BeginPlay();
 	Records.Empty();
-	bCanSaveRecords = true;
+	StartRecording();
 }
 
 
@@ -31,10 +32,23 @@ void UTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 
 void UTimeWatcher::SaveCurrentRecord()
 {
+	if (!bCanSaveRecords) return;
 	FRecordData Record = FRecordData();
 	Record.Position = this->GetOwner()->GetActorLocation();
 	Record.Rotation = this->GetOwner()->GetActorRotation();
 	Record.AnimationName = "";
 	Records.Add(Record);
+}
+
+void UTimeWatcher::StartRecording()
+{
+	bCanSaveRecords = true;
+	GetWorld()->GetTimerManager().SetTimer(RecordTimer, this, &UTimeWatcher::SaveCurrentRecord, 1/RecordSavingFrequency, false);
+}
+
+void UTimeWatcher::StopRecording()
+{
+	bCanSaveRecords = false;
+	GetWorld()->GetTimerManager().ClearTimer(RecordTimer);
 }
 

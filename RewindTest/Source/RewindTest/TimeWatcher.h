@@ -71,6 +71,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Record, meta = (AllowPrivateAccess = "true"))
 	int RecordSavingFrequency = 16;
 
+	/* Handle to manage the recording timer */
+	FTimerHandle RecordTimer;
+
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
