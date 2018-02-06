@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TimeWatcher.h"
-
+#include "Components/ActorComponent.h"
 
 // Sets default values for this component's properties
 UTimeWatcher::UTimeWatcher()
@@ -10,7 +10,7 @@ UTimeWatcher::UTimeWatcher()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	Records=  TArray<FRecordData>();
 }
 
 
@@ -30,5 +30,13 @@ void UTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UTimeWatcher::SaveCurrentRecord()
+{
+	FRecordData Record = FRecordData();
+	Record.Position = this->GetOwner()->GetActorLocation();
+	Record.Rotation = this->GetOwner()->GetActorRotation();
+	Records.Add(Record);
 }
 
