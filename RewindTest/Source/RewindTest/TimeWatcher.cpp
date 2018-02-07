@@ -26,12 +26,19 @@ void UTimeWatcher::BeginPlay()
 void UTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (bIsRewinding)
+	{
+		ApplyRecord(CurrentRecordIndex);
+		
+		UE_LOG(LogTemp, Warning, TEXT("<< Rewinding data %d of %d"), CurrentRecordIndex, Records.Num() - 1);
+		CurrentRecordIndex--;
+		if (CurrentRecordIndex < 0) bIsRewinding = false;
+	}
 }
 
 void UTimeWatcher::SaveCurrentRecord()
 {
 	if (!bCanSaveRecords) return;
-	//UE_LOG(LogTemp, Warning, TEXT("Recording data"));
 	FRecordData Record = FRecordData();
 	Record.Position = this->GetOwner()->GetActorLocation();
 	Record.Rotation = this->GetOwner()->GetActorRotation();
@@ -55,11 +62,14 @@ void UTimeWatcher::StopRecording()
 void UTimeWatcher::Rewind()
 {
 	StopRecording();
-	int Index = Records.Num();
-	for(int i= Index; i>=0; i--)
+	bIsRewinding = true;
+	CurrentRecordIndex = Records.Num()-1;
+	UE_LOG(LogTemp, Warning, TEXT("<< Lets rewind "));
+	/*for(int i= Index-1; i>=0; i--)
 	{ 
-		ApplyRecord(Index);
-	}
+		
+		if (i>=0) ApplyRecord(i);
+	}*/
 }
 
 void UTimeWatcher::Replay()
@@ -69,6 +79,7 @@ void UTimeWatcher::Replay()
 
 void UTimeWatcher::ApplyRecord(int Index)
 {
+	UE_LOG(LogTemp, Warning, TEXT(">> Lets apply Record data %d"), Index);
 	this->GetOwner()->SetActorLocation(Records[Index].Position);
 	this->GetOwner()->SetActorRotation(Records[Index].Rotation);
 }

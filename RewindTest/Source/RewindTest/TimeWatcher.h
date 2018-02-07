@@ -66,9 +66,21 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Record, meta = (AllowPrivateAccess = "true"))
 	bool bCanSaveRecords= false;
 
+	/* This is component is rewinding records?. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Record, meta = (AllowPrivateAccess = "true"))
+	bool bIsRewinding = false;
+
+	/* This is component is replaying records?. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Record, meta = (AllowPrivateAccess = "true"))
+	bool bIsReplaying = false;
+
 	/* Times for second we are going to record data. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Record, meta = (AllowPrivateAccess = "true"))
 	int RecordSavingFrequency = 16;
+
+	/* Current record data index being reproduced (in rewind or replay). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Record, meta = (AllowPrivateAccess = "true"))
+	int CurrentRecordIndex = 0;
 
 	/* Handle to manage the recording timer */
 	FTimerHandle RecordTimer;
