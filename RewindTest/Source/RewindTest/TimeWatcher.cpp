@@ -7,8 +7,6 @@
 // Sets default values for this component's properties
 UTimeWatcher::UTimeWatcher()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
 	Records=  TArray<FRecordData>();
@@ -33,22 +31,45 @@ void UTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 void UTimeWatcher::SaveCurrentRecord()
 {
 	if (!bCanSaveRecords) return;
+	//UE_LOG(LogTemp, Warning, TEXT("Recording data"));
 	FRecordData Record = FRecordData();
 	Record.Position = this->GetOwner()->GetActorLocation();
 	Record.Rotation = this->GetOwner()->GetActorRotation();
 	Record.AnimationName = "";
 	Records.Add(Record);
+	//UE_LOG(LogTemp, Warning, TEXT("Recording data %d"), Records.Num());
 }
 
 void UTimeWatcher::StartRecording()
 {
 	bCanSaveRecords = true;
-	GetWorld()->GetTimerManager().SetTimer(RecordTimer, this, &UTimeWatcher::SaveCurrentRecord, 1/RecordSavingFrequency, false);
+	GetWorld()->GetTimerManager().SetTimer(RecordTimer, this, &UTimeWatcher::SaveCurrentRecord, 0.05f, true); // 1/RecordSavingFrequency
 }
 
 void UTimeWatcher::StopRecording()
 {
 	bCanSaveRecords = false;
 	GetWorld()->GetTimerManager().ClearTimer(RecordTimer);
+}
+
+void UTimeWatcher::Rewind()
+{
+	StopRecording();
+	int Index = Records.Num();
+	for(int i= Index; i>=0; i--)
+	{ 
+		ApplyRecord(Index);
+	}
+}
+
+void UTimeWatcher::Replay()
+{
+	StopRecording();
+}
+
+void UTimeWatcher::ApplyRecord(int Index)
+{
+	this->GetOwner()->SetActorLocation(Records[Index].Position);
+	this->GetOwner()->SetActorRotation(Records[Index].Rotation);
 }
 

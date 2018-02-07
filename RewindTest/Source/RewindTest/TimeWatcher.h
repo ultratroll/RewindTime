@@ -8,9 +8,7 @@
 
 class ActorComponent;
 
-/*
-	.
-*/
+/* Structure to record historic data. */
 USTRUCT(BlueprintType)
 struct FRecordData
 {
@@ -46,6 +44,7 @@ struct FRecordData
 	}
 };
 
+/* The time watcher component serves to record historic data and reproduce it (for replays and winding). */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class REWINDTEST_API UTimeWatcher : public UActorComponent
 {
@@ -89,4 +88,15 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintCallable, Category = Projectile)
 	void StopRecording();
 
+	/* Rewind. */
+	UFUNCTION(BlueprintCallable, BlueprintCallable, Category = Projectile)
+	void Rewind();
+
+	/* Replay. */
+	UFUNCTION(BlueprintCallable, BlueprintCallable, Category = Projectile)
+	void Replay();
+
+	/* Lets apply the record data in the given index. */
+	UFUNCTION(BlueprintCallable, BlueprintCallable, Category = Projectile)
+	void ApplyRecord(int Index);
 };
