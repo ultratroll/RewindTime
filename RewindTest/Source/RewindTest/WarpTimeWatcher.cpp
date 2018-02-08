@@ -22,6 +22,12 @@ void UWarpTimeWatcher::BeginPlay()
 }
 
 
+void UWarpTimeWatcher::UpdateRealDeltaTime()
+{
+	RealDeltaTime = UGameplayStatics::GetRealTimeSeconds(GetWorld()) -RealTime;
+	RealTime = UGameplayStatics::GetRealTimeSeconds(GetWorld());
+}
+
 void UWarpTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -35,7 +41,8 @@ void UWarpTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 				CurrentRecordDeltaTime = RecordDeltaTime;
 				bIsInterpolatingRecords = true;
 			}
-			CurrentRecordDeltaTime -= DeltaTime;
+			UpdateRealDeltaTime();
+			CurrentRecordDeltaTime -= RealDeltaTime; // DeltaTime
 			float Alpha = (1 - (CurrentRecordDeltaTime / RecordDeltaTime)); // This DeltaTime wont serve us in pause, will calculate our own with getrealtime
 
 			UE_LOG(LogTemp, Warning, TEXT(">> Before %d :: %f"), CurrentRecordIndex, Alpha);

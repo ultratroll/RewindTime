@@ -90,6 +90,15 @@ private:
 	/** For internal use. The current time bettwen two records being interpolated. */
 	float CurrentRecordDeltaTime;
 
+	/** For internal use. The real delta time. */
+	float RealDeltaTime;
+
+	/** For internal use. The real time. */
+	float RealTime;
+
+	/** Update the real delta time. */
+	void UpdateRealDeltaTime();
+
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
