@@ -38,6 +38,7 @@ void UWarpTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 			if (!bIsInterpolatingRecords)
 			{
 				RecordDeltaTime = Records[CurrentRecordIndex].Time - Records[CurrentRecordIndex - 1].Time;
+				RecordDeltaTime = (1.0f/RewindRate) * RecordDeltaTime;
 				CurrentRecordDeltaTime = RecordDeltaTime;
 				bIsInterpolatingRecords = true;
 			}
@@ -57,6 +58,7 @@ void UWarpTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		else {
 			// Is not possible to continue rewinding trough records 
 			bIsRewinding = false;
+			Replay();
 		}
 
 		/* old way
@@ -73,6 +75,7 @@ void UWarpTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 			if (!bIsInterpolatingRecords)
 			{
 				RecordDeltaTime = Records[CurrentRecordIndex+1].Time - Records[CurrentRecordIndex].Time;
+				RecordDeltaTime = (1.0f / ReplayRate) * RecordDeltaTime;
 				CurrentRecordDeltaTime = RecordDeltaTime;
 				bIsInterpolatingRecords = true;
 			}
@@ -121,14 +124,23 @@ void UWarpTimeWatcher::Rewind()
 {
 	StopRecording();
 	bIsRewinding = true;
-	CurrentRecordIndex = Records.Num()-1;
+	CurrentRecordIndex = Records.Num()-1; // Always rewind from the latest record
 }
 
 void UWarpTimeWatcher::Replay()
 {
 	StopRecording();
 	bIsReplaying = true;
-	//CurrentRecordIndex = 0;
+}
+
+void UWarpTimeWatcher::SetRewindRate(float Rate)
+{
+	RewindRate = Rate;
+}
+
+void UWarpTimeWatcher::SetReplayRate(float Rate)
+{
+	ReplayRate = Rate;
 }
 
 void UWarpTimeWatcher::ApplyRecordByIndex(int Index)
