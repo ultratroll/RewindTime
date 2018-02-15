@@ -48,7 +48,7 @@ void UWarpTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 			UE_LOG(LogTemp, Warning, TEXT(">> Before %d :: %f"), CurrentRecordIndex, Alpha);
 
-			InterpolateRecords(Records[CurrentRecordIndex], Records[CurrentRecordIndex - 1], Alpha);
+			if (Alpha <= 1)InterpolateRecords(Records[CurrentRecordIndex], Records[CurrentRecordIndex - 1], Alpha);
 			if (Alpha >= 1)
 			{
 				bIsInterpolatingRecords= false;
@@ -58,7 +58,7 @@ void UWarpTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		else {
 			// Is not possible to continue rewinding trough records 
 			bIsRewinding = false;
-			Replay();
+			//Replay();
 		}
 
 		/* old way
