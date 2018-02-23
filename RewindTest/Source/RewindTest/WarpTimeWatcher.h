@@ -99,6 +99,12 @@ private:
 	/** Update the real delta time. */
 	void UpdateRealDeltaTime();
 
+	/** Rewind rate. Regular rewind speed at 1. */
+	float RewindRate= 1.0f;
+
+	/** Replay rate. Regular replay speed at 1. */
+	float ReplayRate = 1.0f;
+
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -121,6 +127,20 @@ public:
 	/** Replay. */
 	UFUNCTION(BlueprintCallable, BlueprintCallable, Category = Projectile)
 	void Replay();
+
+	/**
+	*	Setter rewind rate.
+	*	@param	Rate	Rate to be applied.
+	*/
+	UFUNCTION(BlueprintCallable, BlueprintCallable, Category = Projectile)
+		void SetRewindRate(float Rate);
+
+	/** 
+	*	Setter replay rate. 
+	*	@param	Rate	Rate to be applied.
+	*/
+	UFUNCTION(BlueprintCallable, BlueprintCallable, Category = Projectile)
+		void SetReplayRate(float Rate);
 
 	/** 
 	*	Lets apply the record data in the given index. 

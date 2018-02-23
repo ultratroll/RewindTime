@@ -9,7 +9,7 @@
 UWarpTimeWatcher::UWarpTimeWatcher()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-
+	SetTickableWhenPaused(true);
 	Records=  TArray<FWarpRecordData>();
 }
 
@@ -38,6 +38,7 @@ void UWarpTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 			if (!bIsInterpolatingRecords)
 			{
 				RecordDeltaTime = Records[CurrentRecordIndex].Time - Records[CurrentRecordIndex - 1].Time;
+				RecordDeltaTime = (1.0f/RewindRate) * RecordDeltaTime;
 				CurrentRecordDeltaTime = RecordDeltaTime;
 				bIsInterpolatingRecords = true;
 			}
@@ -47,7 +48,7 @@ void UWarpTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 			UE_LOG(LogTemp, Warning, TEXT(">> Before %d :: %f"), CurrentRecordIndex, Alpha);
 
-			InterpolateRecords(Records[CurrentRecordIndex], Records[CurrentRecordIndex - 1], Alpha);
+			if (Alpha <= 1)InterpolateRecords(Records[CurrentRecordIndex], Records[CurrentRecordIndex - 1], Alpha);
 			if (Alpha >= 1)
 			{
 				bIsInterpolatingRecords= false;
@@ -57,6 +58,7 @@ void UWarpTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		else {
 			// Is not possible to continue rewinding trough records 
 			bIsRewinding = false;
+			//Replay();
 		}
 
 		/* old way
@@ -65,6 +67,33 @@ void UWarpTimeWatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		if (CurrentRecordIndex < 0) 
 			bIsRewinding = false;*/
 			
+	}
+	if (bIsReplaying)
+	{
+		if ((CurrentRecordIndex + 1) < Records.Num())
+		{
+			if (!bIsInterpolatingRecords)
+			{
+				RecordDeltaTime = Records[CurrentRecordIndex+1].Time - Records[CurrentRecordIndex].Time;
+				RecordDeltaTime = (1.0f / ReplayRate) * RecordDeltaTime;
+				CurrentRecordDeltaTime = RecordDeltaTime;
+				bIsInterpolatingRecords = true;
+			}
+			UpdateRealDeltaTime();
+			CurrentRecordDeltaTime -= RealDeltaTime; // DeltaTime
+			float Alpha = (1 - (CurrentRecordDeltaTime / RecordDeltaTime)); // This DeltaTime wont serve us in pause, will calculate our own with getrealtime
+
+			InterpolateRecords(Records[CurrentRecordIndex], Records[CurrentRecordIndex + 1], Alpha);
+			if (Alpha >= 1)
+			{
+				bIsInterpolatingRecords = false;
+				CurrentRecordIndex++;
+			}
+		}
+		else {
+			// Is not possible to continue replaying trough records 
+			bIsReplaying = false;
+		}
 	}
 }
 
@@ -95,12 +124,23 @@ void UWarpTimeWatcher::Rewind()
 {
 	StopRecording();
 	bIsRewinding = true;
-	CurrentRecordIndex = Records.Num()-1;
+	CurrentRecordIndex = Records.Num()-1; // Always rewind from the latest record
 }
 
 void UWarpTimeWatcher::Replay()
 {
 	StopRecording();
+	bIsReplaying = true;
+}
+
+void UWarpTimeWatcher::SetRewindRate(float Rate)
+{
+	RewindRate = Rate;
+}
+
+void UWarpTimeWatcher::SetReplayRate(float Rate)
+{
+	ReplayRate = Rate;
 }
 
 void UWarpTimeWatcher::ApplyRecordByIndex(int Index)
